@@ -18,15 +18,17 @@ public class DataTypeRegistry {
 
     public static HeldDataType<MatchingIngredientData> MATCHING_INGREDIENT = register(new HeldDataType<>(PebbleMod.path("matching_ingredient"), o -> {
         Ingredient ingredient = Ingredient.fromJson(o.get("ingredient"));
+        float chance = o.has("chance") ? o.get("chance").getAsFloat() : 1;
         int durabilityCost = o.has("durability_cost") ? o.get("durability_cost").getAsInt() : 0;
         boolean consumeItemInstead = o.has("consume_item") && o.get("consume_item").getAsBoolean();
-        return new MatchingIngredientData(ingredient, durabilityCost, consumeItemInstead);
+        return new MatchingIngredientData(ingredient, chance, durabilityCost, consumeItemInstead);
     }));
 
     public static HeldDataType<ToolActionData> HAS_TOOL_ACTION = register(new HeldDataType<>(PebbleMod.path("has_tool_action"), o -> {
         net.minecraftforge.common.ToolAction toolAction = net.minecraftforge.common.ToolAction.get(o.get("tool_action").getAsString());
+        float chance = o.has("chance") ? o.get("chance").getAsFloat() : 1;
         int durabilityCost = o.has("durability_cost") ? o.get("durability_cost").getAsInt() : 0;
-        return new ToolActionData(toolAction, durabilityCost);
+        return new ToolActionData(toolAction, chance, durabilityCost);
     }));
 
     public static <T extends HeldData> HeldDataType<T> register(HeldDataType<T> heldDataType) {

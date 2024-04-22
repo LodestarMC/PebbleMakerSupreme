@@ -12,26 +12,31 @@ import java.util.List;
 
 public class MatchingIngredientData extends HeldData {
     public final Ingredient ingredient;
+    public final float chance;
     public final int durabilityCost;
     public final boolean consumeItemInstead;
 
-    public MatchingIngredientData(Ingredient ingredient, int durabilityCost, boolean consumeItemInstead) {
+    public MatchingIngredientData(Ingredient ingredient, float chance, int durabilityCost, boolean consumeItemInstead) {
         this.ingredient = ingredient;
+        this.chance = chance;
         this.durabilityCost = durabilityCost;
         this.consumeItemInstead = consumeItemInstead;
     }
 
     @Override
     public boolean matches(Player player, InteractionHand hand, ItemStack heldItem) {
+        boolean roll = chance == 1 || player.getRandom().nextFloat() < chance;
         boolean test = consumeItemInstead ? (heldItem.getCount() >= durabilityCost && ingredient.test(heldItem)) : ingredient.test(heldItem);
         if (test && durabilityCost != 0) {
             if (consumeItemInstead) {
-                if (!player.isCreative()) {
+                if (!player.isCreative() && roll) {
                     heldItem.shrink(durabilityCost);
                 }
             }
             else {
-                heldItem.hurtAndBreak(durabilityCost, player, (e) -> e.broadcastBreakEvent(hand));
+                if (roll) {
+                    heldItem.hurtAndBreak(durabilityCost, player, (e) -> e.broadcastBreakEvent(hand));
+                }
             }
         }
         return test;
